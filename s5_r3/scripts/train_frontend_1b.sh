@@ -32,6 +32,8 @@ chunk_right_context=10
 num_epochs=6
 initial_effective_lrate=0.0003
 final_effective_lrate=0.00003
+num_jobs_initial=4
+num_jobs_final=22
 momentum=0.5
 num_chunk_per_minibatch=100
 samples_per_iter=20000
@@ -62,6 +64,18 @@ EOF
  steps/nnet3/xconfig_to_configs.py --xconfig-file $dir/configs/network.xconfig --config-dir $dir/configs/
  echo "End stage 0"
  fi
+#old version as backup
+#  mkdir -p $dir/configs
+ # cat <<EOF > $dir/configs/network.xconfig
+ # input dim=184 name=input
+ # fast-lstmp-layer name=lstm1 input=input cell-dim=256 recurrent-projection-dim=128 non-recurrent-projection-dim=128 delay=-6 
+ # fast-lstmp-layer  name=lstm2 input=lstm1 cell-dim=512 recurrent-projection-dim=256 non-recurrent-projection-dim=256 delay=-6
+ # fast-lstmp-layer  name=lstm3 input=lstm2 cell-dim=1024 recurrent-projection-dim=256 non-recurrent-projection-dim=256 delay=-6
+ # output-layer name=output input=lstm3 dim=1024 max-change=1.5 objective-type=quadratic include-log-softmax=false
+#EOF
+ # steps/nnet3/xconfig_to_configs.py --xconfig-file $dir/configs/network.xconfig --config-dir $dir/configs
+ # echo "End stage 0"
+#fi
 
 if [ $stage -le 1 ]; then
   echo "Begin stage 1: data cleanup"

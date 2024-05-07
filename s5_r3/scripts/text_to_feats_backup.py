@@ -91,8 +91,8 @@ with open (args.text) as f:
         feature_vec=[int(phone) for phone in utterance_str.split()]
         #one hot encoding using dimension of phonemes
         expanded=[[1 if i == feat else 0 for i in range(dim)] for feat in feature_vec]
-        padding=[1 if i == 10  else 0 for i in range(dim)]
-        
+        padding=[1 if i == 1  else 0 for i in range(dim)]
+
         try:
             counter = int(utt2num[utterance_id])-len(expanded)
             
@@ -110,6 +110,7 @@ with open (args.text) as f:
 
             elif counter > 0:
                 counter_temp=counter
+                expansion_factor=int(utt2num[utterance_id])//counter
                 print(utterance_id+'  ' +'[')
                 for i in range(len(expanded)-1):
                     if counter_temp > 0 and i % 3 == 0:
@@ -119,6 +120,7 @@ with open (args.text) as f:
 
                     else:
                         print(*expanded[i])
+                
                 if counter_temp>0:
                     print(*expanded[-1])
                     for i in range(counter_temp-1):

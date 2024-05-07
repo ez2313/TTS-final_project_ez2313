@@ -81,10 +81,11 @@ for line in sys.stdin:
 
                 else:
                     print(*expanded[i])
+
             if counter_temp>0:
                 print(*expanded[-1])
                 for i in range(counter_temp-1):
-                     print(*padding)
+                    print(*padding)
                 padding.append(']')
                 print(*padding)
             else:
@@ -95,10 +96,9 @@ for line in sys.stdin:
         else:
             #shortening if predicted length greater than num_frames
             new_counter= abs(counter)
-            dilution_factor= len(expanded)//new_counter
             print(utterance_id+'  ' +'[')
             for i in range(len(expanded)-1):
-                if new_counter > 0 and i % dilution_factor == 0:
+                if new_counter > 0 and i % 3 == 0:
                     new_counter=new_counter-1
 
                 else:

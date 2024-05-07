@@ -50,14 +50,12 @@ if [ $stage -le 0 ]; then
   mkdir -p $dir/configs
   cat <<EOF > $dir/configs/network.xconfig
   input dim=184 name=input
-  fast-lstmp-layer name=blstm1-forward input=input delay=-1 $lstm_opts
-  fast-lstmp-layer name=blstm1-backward input=input delay=1 $lstm_opts
-  fast-lstmp-layer name=blstm2-forward input=Append(blstm1-forward, blstm1-backward) delay=-2 $lstm_opts
-  fast-lstmp-layer name=blstm2-backward input=Append(blstm1-forward, blstm1-backward) delay=2 $lstm_opts
-  fast-lstmp-layer name=blstm3-forward input=Append(blstm2-forward, blstm2-backward) delay=-3 $lstm_opts
-  fast-lstmp-layer name=blstm3-backward input=Append(blstm2-forward, blstm2-backward) delay=3 $lstm_opts
-  
-  output-layer name=output input=Append(blstm3-forward, blstm3-backward) output-delay=0 objective-type=quadratic include-log-softmax=false dim=1024 max-change=1.5
+  relu-renorm-layer name=tdnn1 dim=1024 input=Append(-2,-1,0,1,2)
+  relu-renorm-layer name=tdnn2 dim=1024 input=Append(-1,2)
+  relu-renorm-layer name=tdnn3 dim=1024 input=Append(-3,3)
+  relu-renorm-layer name=tdnn4 dim=1024 input=Append(-7,2)
+  relu-renorm-layer name=tdnn5 dim=1024
+  output-layer name=output dim=$1024 max-change=1.5 objective-type=quadratic include-log-softmax=false
 EOF
  steps/nnet3/xconfig_to_configs.py --xconfig-file $dir/configs/network.xconfig --config-dir $dir/configs/
  echo "End stage 0"
@@ -75,11 +73,6 @@ if [ $stage -le 2 ]; then
     steps/nnet3/train_raw_rnn.py \
       --stage=$train_stage \
       --cmd="$train_cmd" \
-      --egs.chunk-width=$chunk_width \
-      --egs.chunk-left-context=$chunk_left_context \
-      --egs.chunk-right-context=$chunk_right_context \
-      --egs.chunk-left-context-initial=0 \
-      --egs.chunk-right-context-final=0 \
       --egs.dir="$egs_dir" \
       --feat.cmvn-opts "--norm-means=false --norm-vars=false" \
       --trainer.num-epochs=$num_epochs \
@@ -89,7 +82,6 @@ if [ $stage -le 2 ]; then
       --trainer.optimization.shrink-value 0.99 \
       --trainer.optimization.initial-effective-lrate=$initial_effective_lrate \
       --trainer.optimization.final-effective-lrate=$final_effective_lrate \
-      --trainer.rnn.num-chunk-per-minibatch=$num_chunk_per_minibatch \
       --trainer.optimization.momentum=$momentum \
       --cleanup.remove-egs $remove_egs \
       --use-dense-targets true \

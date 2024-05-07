@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #uni: ez2313
 #script to train frontend RNN using LSTM and training data from prepare_frontend.sh
-stage=0
-train_stage=-10
+stage=2
+train_stage=-3
 feats_dir=data/train_frontend
 targets_scp=data/train_frontend/data/frontend_output.scp
 dir=exp/frontend
@@ -46,18 +46,25 @@ if [ $stage -le 0 ]; then
   lstm_opts="decay-time=20 cell-dim=$cell_dim"
   lstm_opts+=" recurrent-projection-dim=$recurrent_projection_dim"
   lstm_opts+=" non-recurrent-projection-dim=$non_recurrent_projection_dim"
+  lstm_basic="decay-time=20 cell-dim=256"
+  lstm_basic+=" recurrent-projection-dim=128"
+  lstm_basic+=" non-recurrent-projection-dim=128"
 
   mkdir -p $dir/configs
   cat <<EOF > $dir/configs/network.xconfig
   input dim=184 name=input
-  fast-lstmp-layer name=blstm1-forward input=input delay=-1 $lstm_opts
-  fast-lstmp-layer name=blstm1-backward input=input delay=1 $lstm_opts
-  fast-lstmp-layer name=blstm2-forward input=Append(blstm1-forward, blstm1-backward) delay=-2 $lstm_opts
-  fast-lstmp-layer name=blstm2-backward input=Append(blstm1-forward, blstm1-backward) delay=2 $lstm_opts
-  fast-lstmp-layer name=blstm3-forward input=Append(blstm2-forward, blstm2-backward) delay=-3 $lstm_opts
-  fast-lstmp-layer name=blstm3-backward input=Append(blstm2-forward, blstm2-backward) delay=3 $lstm_opts
+  fast-lstmp-layer name=blstm1-forward input=input delay=-1 $lstm_basic
+  fast-lstmp-layer name=blstm1-backward input=input delay=1 $lstm_basic
+  fast-lstmp-layer name=blstm2-forward input=Append(blstm1-forward, blstm1-backward) delay=-2 $lstm_basic
+  fast-lstmp-layer name=blstm2-backward input=Append(blstm1-forward, blstm1-backward) delay=2 $lstm_basic
+  fast-lstmp-layer name=blstm3-forward input=Append(blstm2-forward, blstm2-backward) delay=-2 $lstm_opts
+  fast-lstmp-layer name=blstm3-backward input=Append(blstm2-forward, blstm2-backward) delay=2 $lstm_opts
+  fast-lstmp-layer name=blstm4-forward input=Append(blstm3-forward, blstm3-backward) delay=-3 $lstm_opts
+  fast-lstmp-layer name=blstm4-backward input=Append(blstm3-forward, blstm3-backward) delay=3 $lstm_opts
+  fast-lstmp-layer name=blstm5-forward input=Append(blstm4-forward, blstm4-backward) delay=-3 $lstm_opts
+  fast-lstmp-layer name=blstm5-backward input=Append(blstm4-forward, blstm4-backward) delay=3 $lstm_opts
   
-  output-layer name=output input=Append(blstm3-forward, blstm3-backward) output-delay=0 objective-type=quadratic include-log-softmax=false dim=1024 max-change=1.5
+  output-layer name=output input=Append(blstm5-forward, blstm5-backward) output-delay=0 objective-type=quadratic include-log-softmax=false dim=1024 max-change=1.5
 EOF
  steps/nnet3/xconfig_to_configs.py --xconfig-file $dir/configs/network.xconfig --config-dir $dir/configs/
  echo "End stage 0"
@@ -81,6 +88,7 @@ if [ $stage -le 2 ]; then
       --egs.chunk-left-context-initial=0 \
       --egs.chunk-right-context-final=0 \
       --egs.dir="$egs_dir" \
+      --egs.stage=5 \
       --feat.cmvn-opts "--norm-means=false --norm-vars=false" \
       --trainer.num-epochs=$num_epochs \
       --trainer.samples-per-iter=$samples_per_iter \
