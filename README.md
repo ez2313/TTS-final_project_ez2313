@@ -2,11 +2,13 @@
 Welcome! <br>
 This repository is my final project for COMS6998 Fundamentals of Speech Recognition at Columbia University.
 The project is a Text-To-Speech system using the open source Kaldi platform. The project uses the TEDLIUM dataset and builds off of the s5_r3 recipe. 
-- The training through the initial TDNN follows the TEDLIUM recipe but uses Linear Predictive Coding (LPC) coefficients instead of MFCCs.
-- The heart of the project is an encoder-decoder TDNN neural network for trained with LPC coefficients. The decoder is then detached and used as the backend of the TTS system.
-- The project developed a frontend using text processing and a Bidirectional Long Short Term Memory RNN (BLSTM) to convert input text into speech embeddings. The speech embeddings are then passed into the decoder.
-- Finally, a vocoder uses the predicted LPC coefficients to generate speech in waveform.
-Overall the project demonstrates the ability to develop a low resource TTS system. 
+- Please see the [video](https://www.youtube.com/watch?v=rA2Aw7WRing) for a 3 minute overview of the project and results. Please see the paper for a full discussion.
+- Training requires installation of [Kaldi](https://kaldi-asr.org/). Please see below for instructions regarding additions to the `src ` files. For training a disk with at least 2300GB and a **GPU**.  The Submission_Testing.sh script is designed for use on a system with more limited resources and **CPU only**, and provides an example of inference using the trained models (runtime should be less than 5 minutes). 
+- High level overview of project:
+  - The training through the initial TDNN follows the TEDLIUM recipe but uses Linear Predictive Coding (LPC) coefficients instead of MFCCs.
+  - The heart of the project is an encoder-decoder TDNN neural network for trained with LPC coefficients. The decoder is then detached and used as the backend of the TTS system.
+  - The project developed a frontend using text processing and a Bidirectional Long Short Term Memory RNN (BLSTM) to convert input text into speech embeddings. The speech embeddings are then passed into the decoder.
+  Overall the project demonstrates the ability to develop a low resource TTS system. 
 
 # Table of Contents
 The README will detail the following sections:
