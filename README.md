@@ -2,7 +2,7 @@
 Welcome! <br>
 This repository is my final project for COMS6998 Fundamentals of Speech Recognition at Columbia University.
 The project is a Text-To-Speech system using the open source Kaldi platform. The project uses the TEDLIUM dataset and builds off of the s5_r3 recipe. 
-- Please see the [video](https://www.youtube.com/watch?v=rA2Aw7WRing) for a 3 minute overview of the project and results. Please see the [paper](./Final_paper.pdf) for a full discussion.
+- Please see the [video](https://www.youtube.com/watch?v=rA2Aw7WRing) for a 3 minute overview of the project and results. Please see the [paper](FINAL_paper.pdf) for a full discussion.
 - **Training** requires installation of [Kaldi](https://kaldi-asr.org/) and a disk with at least 2300GB and a **GPU**. Running `run.sh` without any argument from stage 0 will peform the full training. 
 - **Inference and Testing** The trained models can be used as is for inference and testing. The Submission_Testing.sh script is designed for use on a system with more limited resources and **CPU only**, and provides an example of inference using the trained models (runtime should be less than 5 minutes). 
 - High level overview of project:
